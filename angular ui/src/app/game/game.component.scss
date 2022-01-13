@@ -1,0 +1,508 @@
+$main-color: #293578;
+$second-color: #f1604c;//#ff4f27;
+$second-color-light: rgba(241, 96, 76, 0.5);
+$third-color: rgb(8, 145, 190);
+$current-round-tile-color: rgb(210, 229, 235);
+$tile-size: 7.8vh;
+$game-minmum-width: $tile-size*10;
+$tile-border-width: 1px;
+$score-font-size: $tile-size/3;
+$base-font-size: $tile-size/5;
+$button-margin: $tile-size/4;
+$button-container-margin: 5px;
+$button-padding: $tile-size/15;
+$round-number-font-size: $tile-size/5;
+$game-id-font-size: $tile-size/6;
+$default-panel-tiles-color: white;
+$default-tiles-color: white;
+$border-color: $third-color;
+$error-color: rgba(187, 12, 12, 0.3);
+$background-sprite: url("../../assets/tiles_sprite_flip.png");
+$mask: url("../../assets/loading.gif");
+$button-font-color: white;
+
+button{
+    cursor: pointer;
+}
+
+.instructions{
+    position: absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height: 100%;;
+    z-index: 9999;
+    text-align: center;
+    background-color: rgba(0,0,0,0.7);
+
+    .tutorial {
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: $tile-size*11;
+        height: $tile-size*11;
+        max-height: 640px;
+        margin: auto;
+        position: absolute;
+
+        .player{
+            width: $tile-size*11;
+            max-width: 640px;
+        }
+    }
+}
+
+.mask{
+    background-image: $mask;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    opacity: 0.5;
+    position: absolute;
+    top:0;
+    left: 0;
+    z-index: 9999;
+}
+
+.game-holder{
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    min-width: $game-minmum-width;
+    position: relative;
+}
+
+.logo{
+    background-position: center;
+    background-repeat: no-repeat;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: $tile-size*10;
+    visibility: visible;
+    z-index: 1000;
+}
+
+.row{
+    margin: 0 auto;
+    display: block;
+    padding: 0;
+}
+
+.line {
+    height: 0;
+    width: $tile-size*10;
+    border: solid 1px transparent;
+    margin: 3px auto;
+}
+
+.tile{
+    border: $tile-border-width solid $border-color;
+    background-image: $background-sprite;
+    padding: 0;
+    position: relative;
+    display: inline-block;
+}
+
+.panel-tile{
+    background-size: $tile-size*6;
+    width: $tile-size;
+    height: $tile-size;
+    background-color: transparent;
+    border-radius: 2px;
+    border-color: $third-color;
+    margin: 0 3px;
+}
+
+.available-tile{
+    background-color: $default-tiles-color;
+    cursor: pointer;
+    position: absolute;
+    top: -($tile-border-width);
+    left: -($tile-border-width)-3px;
+
+    .discard-button{
+        position: relative;
+        top: 0;
+        left: 0;
+        border-bottom-right-radius: $tile-size/7;
+        width: $tile-size/7;
+        height: $tile-size/7;
+        background-color: rgb(230, 228, 228);
+        outline: 0;
+        border-width: 0;
+
+        &:hover{
+            div{
+                display: block;
+            }
+        }
+
+        div{
+            position: relative;
+            top: 0;
+            left: 0;
+            width: $tile-size;
+            height: $tile-size;
+            background-color: transparent;
+            display: none;
+        }
+
+        button{
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            margin: auto;
+            width: $tile-size;
+            height: $tile-size/3;
+            background-color: $main-color;
+            padding: $button-padding;
+            font-size: $base-font-size;
+            border-width: 0;
+            color: $button-font-color;
+
+            &:hover{
+                background-color: $second-color;
+            }
+        }
+    }
+}
+
+.tile-wrapper{
+    position: relative;
+    height: 0;
+    width: 0;
+}
+
+.score-tile{
+    width: $tile-size/2;
+    height: $tile-size/2;
+    background-size: $tile-size*3;
+    background-color: transparent;
+    background-position: $tile-size*0.75 0;
+    text-align: center;
+    vertical-align: middle;
+    font-size: $score-font-size;
+    color: $main-color;
+    display: table-cell;
+}
+
+.score-board{
+    display: table;
+    .entrance-points{
+        background-position: 0 $tile-size*1.5;
+    }
+    
+    .highway-points{
+        background-position: -$tile-size*0.75 $tile-size*1.5;
+    }
+    
+    .railway-points{
+        background-position: -$tile-size*1.5 $tile-size*1.5;
+    }
+    
+    .central-points{
+        background-position: 0 $tile-size*0.75;    
+    }
+    
+    .error-points{
+        background-position: -$tile-size*2.25 $tile-size*1.5;
+    }
+    
+    .equals{
+        background-position: -$tile-size*0.75 $tile-size*0.75;
+        background-color: transparent;
+    }
+}
+
+.score-board:hover ~ .score-tip{
+    display: block;
+}
+
+.score-board:hover ~ .main-buttons{
+    display: none;
+}
+
+.score-tip {
+    display: none;
+    min-width: $tile-size*7;
+    background-color: transparent;
+    border-spacing: 1px;
+    height: $tile-size*0.75;
+    opacity: 0.6;
+    margin: $tile-border-width auto ($button-container-margin*2 - $tile-border-width)  auto;
+
+    .row {
+        display: table;
+    }
+}
+
+.score-tip-tile{
+    display: table-cell;
+    border: $tile-border-width solid $second-color;
+    background: $default-panel-tiles-color;
+    height: $tile-size/4;
+    width: $tile-size/2;
+    text-align: center;
+    vertical-align: middle;
+    font-size: $base-font-size;
+    display: table-cell;
+}
+
+.entrance-points-tip{
+    background-image: $background-sprite;
+    background-size: $tile-size*3;
+    background-position: 0 $tile-size*1.375;
+}
+
+.main-buttons{
+    position: relative;
+    z-index: 1001;
+    display: block;
+    height: $tile-size*0.75;
+    margin: $button-container-margin 0;
+    button {
+        margin: $button-margin/2 $button-margin;
+        background-color: $main-color;
+        border-width: 0;
+        padding: $button-padding;
+        width: $tile-size*2;
+        height: $tile-size/2.5;
+        font-size: $base-font-size;
+        font-weight: bold;
+        color: $button-font-color;
+        outline: 0;
+
+        &:hover{
+            background-color: $second-color;
+        }
+
+        &:active{
+            background-color: $second-color;
+        }
+
+        &:disabled{
+            opacity: 0.5;
+        }
+    }
+
+    .invisible{
+        visibility: hidden;
+    }
+
+    .new-game-button{
+        width: $tile-size*2 - $tile-size/3;
+        margin: $button-margin/2 0 $button-margin/2 $button-margin;
+    }
+
+    .game-id-input{
+        width: $tile-size*2 - $tile-size/3;
+        height: $tile-size/2.5;
+        margin: $button-margin/2 0 $button-margin/2 $button-margin;
+        border-color: $main-color;
+        box-sizing: border-box;
+        font-size: $round-number-font-size;
+        outline: 0;
+    }
+
+    .game-id-button{
+        width: $tile-size/3;
+        margin: $button-margin/2 $button-margin $button-margin/2 0;
+    }
+}
+
+.map-tile{
+    background-color: $default-tiles-color;
+    background-size: $tile-size*6;
+    width: $tile-size;
+    height: $tile-size;
+    border-color: $third-color;
+    margin: -1px 1px;
+}
+
+.tile-number{
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: $tile-size*0.2;
+    height: $tile-size*0.2;
+    font-size: $round-number-font-size;
+    color: gray;
+}
+
+.empty-tile{
+    background-position-x: 0;
+    background-position-y: 0;
+}
+
+.central-tile{
+    border-color: $second-color;
+}
+
+.edge-tile{
+    background-image: none;
+    background-color: transparent;
+    border-color: transparent;    
+}
+
+.vertical-edge-tile{
+    width: $tile-size/2;
+}
+
+.horizontal-edge-tile{
+    height: $tile-size/2;
+}
+
+.highway-entrance{
+    background-position-y: $tile-size*6;
+    background-color: transparent;
+    border-color: transparent;    
+}
+
+.railway-entrance{
+    background-position-y: $tile-size*4.5;
+    background-color: transparent;
+    border-color: transparent;    
+}
+
+.selected{
+    border-style: dashed; 
+    border-color: black;
+}
+
+.current-tile{
+    background-color: $current-round-tile-color;
+}
+
+.incorrect{
+    background-color: $second-color-light;
+}
+
+.rotation-0{
+    background-position-x: 0;
+}
+
+.rotation-90{
+    background-position-x: -$tile-size*1.5;
+}
+
+.rotation-180{
+    background-position-x: -$tile-size*3;
+}
+
+.rotation-270{
+    background-position-x: -$tile-size*4.5;
+}
+
+.tile {
+    .action-button{
+        visibility: hidden;
+    }
+
+    &:hover .action-button{
+        visibility: visible;
+    }
+}
+
+.action-button {
+    position: absolute;
+    height: $tile-size/2.1;
+    width: $tile-size/2.1;
+    background-color: transparent;
+    border-width: 0;
+    outline: 0;
+    background-position: 0;
+    z-index: 999;
+}
+
+.rotate-button{
+    border-top-right-radius: 100%;
+}
+
+.flip-button{
+    border-top-left-radius: 100%;
+}
+
+.delete-button{
+    border-bottom-right-radius: 100%;
+}
+
+.action-hint {
+    visibility: hidden;
+    background-image: url("../../assets/icons.png");
+    background-size: $tile-size*3;
+    position: absolute;
+    height: $tile-size;
+    width: $tile-size;
+    background-color: $default-tiles-color;
+    border-width: 0;
+    outline: 0;
+    background-position: 0;
+    top: 0;
+    left: 0;
+    opacity: 0.7;
+    z-index: 998;
+}
+
+.action-button:hover ~ .action-hint{
+    visibility: visible;
+}
+
+.row button[class*='rotate-button']:hover ~ .action-hint{
+    background-position-x: 0;
+}
+
+.row button[class*='flip-button']:hover ~ .action-hint{
+    background-position-x: $tile-size*2;
+}
+
+.row button[class*='delete-button']:hover ~ .action-hint{
+    background-position-x: $tile-size;
+}
+
+.invisible-border{
+    border-color: transparent;
+}
+
+.no-background{
+    background-color: transparent;
+}
+
+.game-id{
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    font-size: $game-id-font-size;
+    color: gray;
+}
+
+.tl{
+    top: 0;
+    left: 0;
+}
+
+.tr{
+    top: 0;
+    right: 0;
+}
+
+.bl{
+    bottom: 0;
+    left: 0;
+}
+
+.br{
+    bottom: 0;
+    right: 0;
+}
+

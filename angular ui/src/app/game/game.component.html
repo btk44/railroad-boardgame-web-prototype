@@ -1,0 +1,125 @@
+<div class="mask" *ngIf="loading"></div>
+
+
+<div class="instructions" *ngIf="howToPlay" (click)="onTutorialClose()">
+  <div class="tutorial">
+    <video class="player" controls (click)="onTutorialClick($event)">
+      <source src="./assets/instructions.mp4" type="video/mp4">
+      Your browser does not support HTML5 video.
+    </video>
+  </div>  
+</div>
+
+
+<div class="game-holder">
+
+  <a href="#">
+    <img class="logo" src="./assets/logo.svg" [style.visibility]="inProgress ? 'hidden' : 'visible'"/>
+  </a>
+
+  <div class="row panel" [style.visibility]="!inProgress ? 'hidden' : 'visible'">
+    <div *ngFor="let specialTileTemplate of specialTileTemplates" 
+          class="tile panel-tile"
+          [style.background-position]="'0 ' + getBackgroundPosition(specialTileTemplate)">
+        <ng-container *ngIf="isAvailable(specialTileTemplate)">
+          <div *ngFor="let specialTile of getAvailableTiles(specialTileTemplate)" 
+                [class]="getAvailableTileClass(specialTile)"
+                draggable="true"
+                (dragstart)="onDragStart($event, specialTile, null, null)"
+                [style.background-position]="'0 ' + getTileBackgroundPosition(specialTile)"
+                (click)="onTileSelection(specialTile, null, null)">
+          </div>   
+        </ng-container> 
+    </div>
+  </div>
+  <div class="line" [style.visibility]="!inProgress ? 'hidden' : 'visible'"></div>
+  <div class="row panel" [style.visibility]="!inProgress ? 'hidden' : 'visible'">
+    <div *ngFor="let standardTileTemplate of standardTileTemplates" 
+      class="tile panel-tile" 
+      [style.background-position]="'0 ' + getBackgroundPosition(standardTileTemplate)"> 
+      <ng-container *ngIf="isAvailable(standardTileTemplate)">
+        <div *ngFor="let standardTile of getAvailableTiles(standardTileTemplate); let i = index" 
+              [class]="getAvailableTileClass(standardTile)"
+              draggable="true"
+              (dragstart)="onDragStart($event, standardTile)"
+              [style.background-position]="'0 ' + getTileBackgroundPosition(standardTile)"
+              (click)="onTileSelection(standardTile, null, null)">
+          <div class="tile-number">{{ i+1 }}</div> 
+          <div class="discard-button">
+            <div>
+              <button (click)="onTileDiscard(standardTile)">discard</button>
+            </div>
+          </div>
+        </div>
+      </ng-container>    
+    </div>
+  </div>
+  <div class="line" [style.visibility]="!inProgress ? 'hidden' : 'visible'"></div>
+
+  <div class="row score-board" [style.visibility]="!inProgress ? 'hidden' : 'visible'">
+    <div class="tile score-tile entrance-points"></div>
+    <div class="tile score-tile invisible-border">{{ gamePoints.entrance }}</div>
+    <div class="tile score-tile highway-points"></div>
+    <div class="tile score-tile invisible-border">{{ gamePoints.highway }}</div>
+    <div class="tile score-tile railway-points"></div>
+    <div class="tile score-tile invisible-border">{{ gamePoints.railway }}</div>
+    <div class="tile score-tile central-points"></div>
+    <div class="tile score-tile invisible-border">{{ gamePoints.central }}</div>
+    <div class="tile score-tile error-points"></div>
+    <div class="tile score-tile invisible-border">{{ gamePoints.errors }}</div>
+    <div class="tile score-tile equals invisible-border"></div>
+    <div class="tile score-tile">
+      {{ gamePoints.entrance + gamePoints.highway + gamePoints.railway + gamePoints.central  - gamePoints.errors }}
+    </div>
+  </div>
+
+  <div class="score-tip">
+    <div class="row">
+      <div class="score-tip-tile entrance-points-tip"></div>
+      <div *ngFor="let entranceCount of [2,3,4,5,6,7,8,9,10,11,12]" class="score-tip-tile">{{ entranceCount }}</div>
+    </div>
+    <div class="row">
+      <div class="score-tip-tile invisible-border no-background"></div>
+      <div *ngFor="let entrancePoints of [4,8,12,16,20,24,28,32,36,40,45]" class="score-tip-tile">{{ entrancePoints }}</div>
+    </div>
+  </div>
+
+  <div class="main-buttons">
+    <button *ngIf="!inProgress" (click)="onTutorialOpen()">How to play</button>
+    <button *ngIf="!inProgress" class="invisible" disabled=true></button>
+    <button *ngIf="inProgress && rollCount < 8" (click)="onNextRoll()" [disabled]="isNextRollBlocked()">{{ getRollButtonText() }}</button>
+    
+    <button *ngIf="!inProgress && !fromGameId" (click)="onNewGame()" class="new-game-button">New game</button>
+    <input *ngIf="!inProgress && fromGameId" type="text" placeholder="#000000" class="game-id-input" [(ngModel)]="userGameId" maxlength="9" (keyup)="onGameIdKey($event)" #userGameIdInput autofocus>
+    <button *ngIf="!inProgress" (click)="onNewGameFromId()" class="game-id-button">{{ fromGameId ? '>' : '#' }}</button>
+
+    <button *ngIf="inProgress" (click)="onQuit()">Quit</button>
+  </div>
+
+
+  <div class="row" *ngFor="let tilesRow of tileMap; let rowIndex = index">
+    <div *ngFor="let tile of tileMap[rowIndex]; let columnIndex = index" 
+          [class]="getTileClass(tile, rowIndex, columnIndex)" 
+          [style.background-position-y]="getTileBackgroundPosition(tile)"
+          cellspacing="0"
+          [draggable]="tile && tile.roundNumber === rollCount"
+          (dragstart)="onDragStart($event, tile, rowIndex, columnIndex)"
+          (drop)="onDrop($event, rowIndex, columnIndex)"
+          (dragover)="onDragOver($event, rowIndex, columnIndex)"
+          (click)="onTileSelection(tile, rowIndex, columnIndex)">
+      <ng-container *ngIf="isTileDeletable(rowIndex, columnIndex)">
+        <div class="tile-number">{{ tile.roundNumber }}</div>
+      </ng-container>
+
+      <ng-container *ngIf="rowIndex === 0 && columnIndex === 7">
+        <div class="game-id">{{gameId}}</div>
+      </ng-container>
+      
+      <button *ngIf="showTileActions(tile)" class="action-button rotate-button bl" (click)="onRotate($event, rowIndex, columnIndex)"></button>
+      <button *ngIf="showTileActions(tile)" class="action-button flip-button br" (click)="onFlip($event, rowIndex, columnIndex)"></button>
+      <button *ngIf="showTileActions(tile)" class="action-button delete-button tl" (click)="onDelete($event, rowIndex, columnIndex)"></button>
+      <div *ngIf="showTileActions(tile)" class="action-hint"></div>
+    </div>
+  </div>
+
+</div>
